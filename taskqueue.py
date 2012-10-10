@@ -6,11 +6,16 @@ from time import time
 import gevent
 
 class TaskQueue(object):
-	def __init__(self, C_queue, C_kvstore, timeout=5):
-		self.waitting_queue = C_queue("waitting_queue")
-		self.running_queue = C_queue("running_queue")
-		self.result_store = C_kvstore("result_store")
+	def __init__(self, name, C_queue, C_kvstore, C_set, timeout=5):
+		self.name = name
+		self.waitting_queue = C_queue(self.make_name("waitting_queue"))
+		self.running_queue = C_queue(self.make_name("running_queue"))
+		self.result_store = C_kvstore(self.make_name("result_store"))
+		self.finished_task = C_set(self.make_name("finished_task"))
 		gevent.spawn(self.cheanup_let, timeout)
+
+	def make_name(self, name):
+		return "%s_%s" % (self.name, name)
 
 	def push_task(self, task):
 		key = gen_key()
@@ -28,6 +33,9 @@ class TaskQueue(object):
 	def get_result(self, key):
 		return self.result_store.get(key)
 
+	def finish_task(self, key):
+		self.finished_task.add(key)
+
 	def cheanup_let(self, timeout):
 		while True:
 			if hasattr(self.waitting_queue, "rpop"):
@@ -38,11 +46,13 @@ class TaskQueue(object):
 			if delta < timeout:
 				sleep(timeout-delta)
 			k,_ = item
-			if not self.result_store.exists(k):
+			if k not in self.finished_task:
 				if hasattr(self.waitting_queue, "lpush"):
 					self.waitting_queue.lpush(item)
 				else:
 					self.waitting_queue.push(item)
+			else:
+				self.finished_task.remove(k)
 
 
 if __name__ == '__main__':
@@ -50,4 +60,4 @@ if __name__ == '__main__':
 	sys.path.append("/Users/zzm/Desktop/Corellia")
 	import Corellia
 	import structs
-	Corellia.Worker(TaskQueue, structs.RedisQueue, structs.RedisKVStore).run_alone(9999)
+	Corellia.Worker(TaskQueue, structs.RedisQueue, structs.RedisKVStore, sturcts.BuiltinSet).run_alone(9999)

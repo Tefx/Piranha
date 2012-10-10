@@ -17,7 +17,10 @@ class Worker(object):
 			while True:
 				try:
 					key, msg = self.queue.pop_task(queue)
-					self.queue.put_result(queue, key, self.handle(msg))
+					res = self.handle(msg)
+					if res != None:
+						self.queue.put_result(queue, key, res)
+					self.queue.finish_task(queue, key)
 				except Exception:
 					break
 

@@ -1,3 +1,4 @@
+from gevent.monkey import patch_all; patch_all()
 import sys
 sys.path.append("/Users/zzm/Desktop/Corellia")
 
@@ -36,11 +37,30 @@ def test_2():
 	sleep(6)
 	print k.status()
 
+
+import requests
+import json
+
+def test_http(no):
+	baseurl = "http://localhost:8080/echo"
+	r = requests.put(baseurl, data=json.dumps(range(no)), headers={'content-type': 'application/json'})
+	result_url = baseurl + "/" + r.headers["key"]
+	while True:
+		r = requests.get(result_url)
+		if r.json:
+			print r.json
+			break
+		sleep(0.2)
+
+
 if __name__ == '__main__':
-	pool = Pool(1000)
-	pool.map(test_single, xrange(10))
+	# pool = Pool(1000)
+	# pool.map(test_single, xrange(10))
 	#test_single(1)
 
 	# test_2()
+
+	pool = Pool(1000)
+	pool.map(test_http, xrange(10))
 
  
