@@ -39,8 +39,15 @@ class RedisQueue(object):
 	def pop(self):
 		return json.loads(self.redis.blpop(self.name, 0)[1])
 
+	def rpop(self):
+		return json.loads(self.redis.brpop(self.name, 0)[1])
+
 	def push(self, item):
 		self.redis.rpush(self.name, json.dumps(item))
+		return True
+
+	def lpush(self, item):
+		self.redis.lpush(self.name, json.dumps(item))
 		return True
 
 

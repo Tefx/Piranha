@@ -7,15 +7,15 @@ from gevent.pool import Pool
 
 def test_single(no):
 	k = Corellia.Client(("localhost", 9999))
-	key = k.push_task(no)
+	key = k.push_task("echo", no)
 	res = None
 	while res == None:
 		try:
-			res = k.get_result(key)
+			res = k.get_result("echo", key)
 		except Exception:
 			try:
 				k = Corellia.Client(("localhost", 9999))
-				res = k.get_result(key)
+				res = k.get_result("echo", key)
 			except Exception:
 				pass
 		sleep(0.2)

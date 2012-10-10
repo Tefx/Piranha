@@ -30,13 +30,19 @@ class TaskQueue(object):
 
 	def cheanup_let(self, timeout):
 		while True:
-			start_time, item = self.running_queue.pop()
+			if hasattr(self.waitting_queue, "rpop"):
+				start_time, item = self.running_queue.rpop()
+			else:
+				start_time, item = self.running_queue.pop()
 			delta = time()-start_time
 			if delta < timeout:
 				sleep(timeout-delta)
 			k,_ = item
 			if not self.result_store.exists(k):
-				self.waitting_queue.push(item)
+				if hasattr(self.waitting_queue, "lpush"):
+					self.waitting_queue.lpush(item)
+				else:
+					self.waitting_queue.push(item)
 
 
 if __name__ == '__main__':

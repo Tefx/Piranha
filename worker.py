@@ -5,10 +5,10 @@ import Corellia
 from time import sleep
 
 class Worker(object):
-	def run(self, queue_addr):
+	def run(self, queuepool_addr, queue):
 		while True:
 			try:
-				self.queue = Corellia.Client(queue_addr)
+				self.queue = Corellia.Client(queuepool_addr)
 			except KeyboardInterrupt:
 				break
 			except Exception:
@@ -16,8 +16,8 @@ class Worker(object):
 				continue
 			while True:
 				try:
-					key, msg = self.queue.pop_task()
-					self.queue.put_result(key, self.handle(msg))
+					key, msg = self.queue.pop_task(queue)
+					self.queue.put_result(queue, key, self.handle(msg))
 				except Exception:
 					break
 
@@ -33,4 +33,4 @@ if __name__ == '__main__':
 			sleep(1)
 			print "ending"
 			return msg
-	EchoWorker().run(("localhost", 9999))
+	EchoWorker().run(("localhost", 9999), "echo")
