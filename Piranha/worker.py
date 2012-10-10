@@ -4,7 +4,7 @@ sys.path.append("/Users/zzm/Desktop/Corellia")
 import Corellia
 from time import sleep
 
-class Worker(object):
+class BaseWorker(object):
 	def run(self, queuepool_addr, queue):
 		while True:
 			try:
@@ -24,12 +24,9 @@ class Worker(object):
 				except Exception:
 					break
 
-	def handle(self):
-		pass
-
 if __name__ == '__main__':
 	from time import sleep
-	class EchoWorker(Worker):
+	class EchoWorker(BaseWorker):
 		def handle(self, msg):
 			print msg
 			print "starting"
