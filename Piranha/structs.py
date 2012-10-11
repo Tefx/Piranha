@@ -1,44 +1,12 @@
 from gevent import monkey
 monkey.patch_all()
-
-from gevent.queue import Queue
-
-
-class GeventQueue(Queue):
-	def pop(self):
-		return self.get()
-
-	def push(self, item):
-		self.put(item)
-		return True
-
-
-class BuiltinKVStore(dict):
-	def __init__(self, name, *args):
-		super(BuiltinSet, self).__init__(*args)
-		self.name = name	
-
-	def put(self, key, value):
-		self[key] = value
-		return key
-
-	def get(self, key):
-		return self.get(key, None)
-
-class BuiltinSet(set):
-	def __init__(self, name, *args):
-		super(BuiltinSet, self).__init__(*args)
-		self.name = name		
-
-
 from redis import StrictRedis
 import json as json
 
-
 class RedisStruct(object):
-	def __init__(self, name):
+	def __init__(self, name, db_conf):
 		self.name = name
-		self.redis = StrictRedis(host='localhost', port=6379, db=0)	
+		self.redis = StrictRedis(host=db_conf["host"], port=db_conf["port"], db=db_conf["db"])	
 
 
 class RedisQueue(RedisStruct):
@@ -58,15 +26,15 @@ class RedisQueue(RedisStruct):
 
 
 class RedisKVStore(RedisStruct):
-	def put(self, key, value):
-		try:
-			self.redis.hset(self.name, key, value)
-			return key
-		except Exception:
-			return False
+	def put(self, key, value, ttl=None):
+		if ttl:
+			self.redis.setex("%s_%s" % (self.name, key), ttl, value)
+		else:
+			self.redis.set("%s_%s" % (self.name, key), value)
+		return key
 
 	def get(self, key):
-		return self.redis.hget(self.name, key)
+		return self.redis.get("%s_%s" % (self.name, key))
 
 
 class RedisSet(RedisStruct):
@@ -78,11 +46,3 @@ class RedisSet(RedisStruct):
 
 	def __contains__(self, value):
 		return self.redis.sismember(self.name, value)
-
-if __name__ == '__main__':
-	r = RedisKVStore("test")
-	k = r.put(1,2)
-	print r.get(k)
-	print r.get(3)
-	print r.exists(2)
-	print r.exists(k)

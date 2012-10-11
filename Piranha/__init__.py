@@ -1,3 +1,4 @@
+import config
 import structs
 from taskqueue import TaskQueue
 from queuepool import QueuePool

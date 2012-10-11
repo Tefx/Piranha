@@ -5,13 +5,17 @@ from gevent import sleep
 from time import time
 import gevent
 
+from structs import RedisQueue as C_queue
+from structs import RedisKVStore as C_kvstore
+from structs import RedisSet as C_set
+
 class TaskQueue(object):
-	def __init__(self, name, C_queue, C_kvstore, C_set, timeout=5):
+	def __init__(self, name, db_conf=None, timeout=5):
 		self.name = name
-		self.waitting_queue = C_queue(self.make_name("waitting_queue"))
-		self.running_queue = C_queue(self.make_name("running_queue"))
-		self.result_store = C_kvstore(self.make_name("result_store"))
-		self.finished_task = C_set(self.make_name("finished_task"))
+		self.waitting_queue = C_queue(self.make_name("waitting_queue"), db_conf)
+		self.running_queue = C_queue(self.make_name("running_queue"), db_conf)
+		self.result_store = C_kvstore(self.make_name("result"), db_conf)
+		self.finished_task = C_set(self.make_name("finished_task"), db_conf)
 		gevent.spawn(self.cheanup_let, timeout)
 
 	def make_name(self, name):
@@ -27,8 +31,8 @@ class TaskQueue(object):
 		self.running_queue.push((time(), item))
 		return item
 
-	def put_result(self, key, result):
-		return self.result_store.put(key, result)
+	def put_result(self, key, result, ttl=None):
+		return self.result_store.put(key, result, ttl)
 
 	def get_result(self, key):
 		return self.result_store.get(key)
@@ -38,26 +42,12 @@ class TaskQueue(object):
 
 	def cheanup_let(self, timeout):
 		while True:
-			if hasattr(self.waitting_queue, "rpop"):
-				start_time, item = self.running_queue.rpop()
-			else:
-				start_time, item = self.running_queue.pop()
+			start_time, item = self.running_queue.rpop()
 			delta = time()-start_time
 			if delta < timeout:
 				sleep(timeout-delta)
 			k,_ = item
 			if k not in self.finished_task:
-				if hasattr(self.waitting_queue, "lpush"):
-					self.waitting_queue.lpush(item)
-				else:
-					self.waitting_queue.push(item)
+				self.waitting_queue.lpush(item)
 			else:
 				self.finished_task.remove(k)
-
-
-if __name__ == '__main__':
-	import sys
-	sys.path.append("/Users/zzm/Desktop/Corellia")
-	import Corellia
-	import structs
-	Corellia.Worker(TaskQueue, structs.RedisQueue, structs.RedisKVStore, sturcts.BuiltinSet).run_alone(9999)
