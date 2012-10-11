@@ -6,8 +6,11 @@ redis_conf = {
     "db" : 0
 }
 
+timeout = 5
+
 queuesconfig = { 
-    "echo"  :   (redis_conf, 5)
+    "echo"  :   (redis_conf, timeout),
+    "math"  :   (redis_conf, timeout)
 }
 
 queuepool_port = 9999

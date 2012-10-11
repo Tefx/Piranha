@@ -52,6 +52,18 @@ def test_http(no):
 			break
 		sleep(0.2)
 
+def test_http_multitask(no):
+	baseurl = "http://localhost:8080/"
+	task_url = baseurl + "task/math/add"
+	r = requests.put(task_url, data=json.dumps((no, no+1)), headers={'content-type': 'application/json'})
+	result_url = baseurl + "result/math/" + r.headers["key"]
+	while True:
+		r = requests.get(result_url)
+		if r.json:
+			print r.json
+			break
+		sleep(0.2)
+
 
 if __name__ == '__main__':
 	# pool = Pool(1000)
@@ -60,7 +72,9 @@ if __name__ == '__main__':
 
 	# test_2()
 
-	pool = Pool(1000)
-	pool.map(test_http, xrange(10))
+	# pool = Pool(1000)
+	# pool.map(test_http, xrange(10))
+
+	test_http_multitask(10)
 
  

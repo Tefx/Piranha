@@ -1,5 +1,4 @@
-from gevent import monkey
-monkey.patch_all()
+from gevent import monkey; monkey.patch_all()
 from redis import StrictRedis
 import json as json
 
