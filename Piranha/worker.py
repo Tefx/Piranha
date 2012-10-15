@@ -49,6 +49,8 @@ class MutableWorker(MultiTaskWorker):
 		if name in self.mods:
 			delattr(self, name)
 			self.mods.remove(name)
+		else:
+			raise Exception
 
 class AbstractWorker(MutableWorker, Telescreen):
     monitoring = ["mods"]
