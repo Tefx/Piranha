@@ -7,7 +7,7 @@ class EchoWorker(BaseWorker):
         print "starting"
         sleep(1)
         print "ending"
-        return msg, None
+        return msg
 
 if __name__ == '__main__':
     EchoWorker().run((config.queuepool_host, config.queuepool_port), "echo")

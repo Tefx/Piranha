@@ -1,6 +1,6 @@
 from gevent import monkey; monkey.patch_all()
 from redis import StrictRedis
-import json as json
+import Husky
 
 class RedisStruct(object):
 	def __init__(self, name, db_conf):
@@ -10,17 +10,17 @@ class RedisStruct(object):
 
 class RedisQueue(RedisStruct):
 	def pop(self):
-		return json.loads(self.redis.blpop(self.name, 0)[1])
+		return Husky.loads(self.redis.blpop(self.name, 0)[1])
 
 	def rpop(self):
-		return json.loads(self.redis.brpop(self.name, 0)[1])
+		return Husky.loads(self.redis.brpop(self.name, 0)[1])
 
 	def push(self, item):
-		self.redis.rpush(self.name, json.dumps(item))
+		self.redis.rpush(self.name, Husky.dumps(item))
 		return True
 
 	def lpush(self, item):
-		self.redis.lpush(self.name, json.dumps(item))
+		self.redis.lpush(self.name, Husky.dumps(item))
 		return True
 
 
