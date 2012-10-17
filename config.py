@@ -29,3 +29,4 @@ web_server = "auto"
 
 miniture_addr = ("localhost", 10000)
 
+supervisor_port = 7890
