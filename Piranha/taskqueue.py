@@ -21,13 +21,16 @@ class TaskQueue(object):
 	def make_name(self, name):
 		return "%s_%s" % (self.name, name)
 
-	def push_task(self, task):
+	def push_task(self, task, timeout=60):
 		key = gen_key()
-		if self.waitting_queue.push((key, task)):
+		if self.waitting_queue.push((time(), timeout, (key, task))):
 			return key
 
 	def pop_task(self):
-		item = self.waitting_queue.pop()
+		while True:
+			put_time, timeout, item = self.waitting_queue.pop()
+			if time()-put_time < timeout:
+				break
 		self.running_queue.push((time(), item))
 		return item
 
