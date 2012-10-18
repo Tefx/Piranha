@@ -5,7 +5,7 @@ import collections
 from Thinkpol import Telescreen
 
 class Worker(Telescreen):
-    monitoring = ["proc_id"]
+    monitoring = ["pid"]
 
     def __init__(self, cmd, miniture_addr):
         super(Worker, self).__init__()
@@ -18,17 +18,14 @@ class Worker(Telescreen):
 
     def keep_alive(self):
         self._p = psutil.Popen(self.cmd, shell=False, stdout=PIPE)
-        self.proc_id = self.pid
         while True:
             if self._p.status != psutil.STATUS_RUNNING:
                 self._p = psutil.Popen(self.cmd, shell=False, stdout=PIPE)
-                self.proc_id = self.pid
             gevent.sleep(1)
 
     def restart(self):
         self._p.kill()
         self._p = psutil.Popen(self.cmd, shell=False, stdout=PIPE)
-        self.proc_id = self.pid
 
     def stop(self):
         self._keeplet.kill(block=True)

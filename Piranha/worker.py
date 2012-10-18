@@ -1,6 +1,5 @@
 import Corellia
 from time import sleep
-from Thinkpol import Telescreen
 
 
 class BaseWorker(object):
@@ -12,6 +11,8 @@ class BaseWorker(object):
 			if not self.queue:
 				try:
 					self.queue = Corellia.Client(queuepool_addr)
+				except KeyboardInterrupt:
+					break
 				except Exception:
 					sleep(2)
 					continue
@@ -23,6 +24,8 @@ class BaseWorker(object):
 			try:
 				res = self.handle(msg)
 				self.queue.finish_task(queue, key)
+			except KeyboardInterrupt:
+				break
 			except Exception:
 				continue
 			if res != None:
@@ -51,11 +54,4 @@ class MutableWorker(MultiTaskWorker):
 			self.mods.remove(name)
 		else:
 			raise Exception
-
-class AbstractWorker(MutableWorker, Telescreen):
-    monitoring = ["mods"]
-
-    def __init__(self, miniture_addr):
-        super(AbstractWorker, self).__init__()
-        self._connect(miniture_addr)
 
