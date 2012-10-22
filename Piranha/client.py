@@ -2,7 +2,7 @@ import Corellia
 
 
 class Client(object):
-    def __init__(self, root_addr, path):
+    def __init__(self, root_addr, path="/"):
         self.client = Corellia.Client(root_addr)
         self.root_addr = root_addr
         if path == "/": path = ""
@@ -30,7 +30,7 @@ class Client(object):
         self.client.delete(self.join_path(name))
 
     def __getattr__(self, name):
-        return Client(self, root_addr, self.path.join_path(name))
+        return Client(self.root_addr, self.join_path(name))
 
     def __call__(self, *args):
         key = self.client.push_task(self.path, Task(args))

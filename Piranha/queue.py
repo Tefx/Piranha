@@ -16,7 +16,6 @@ class TaskQueue(Telescreen):
     def __init__(self, path, db_conf, handler=None, ttl=None, queue_timeout=60, task_timeout=5):
         super(TaskQueue, self).__init__()
         self.path = path
-        self.handler = handler
         self.ttl = ttl
         self.queue_timeout = queue_timeout
         self.task_timeout = task_timeout
@@ -24,6 +23,12 @@ class TaskQueue(Telescreen):
         self.running_queue = RedisQueue(self.make_name("running_queue"), db_conf)
         self.result_store = RedisKVStore(self.make_name("result_dict"), db_conf)
         self.finished_task = RedisSet(self.make_name("finished_task"), db_conf)
+        self.store = RedisKVStore(self.make_name("store"), db_conf)
+        if not handler:
+            self.handler = self.store.get("handler")
+        else:
+            self.handler = handler
+            self.store.put("handler", handler)
         self._connect(config.miniture_addr)
         gevent.spawn(self.cheanup_let)
 

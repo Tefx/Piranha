@@ -43,7 +43,6 @@ class Worker(Telescreen):
 					continue
 
 	def handle(self, task):
-		print type(task)
 		self.oldpath = self.path
 		if isinstance(task, tasktypes.NewWorkerTask):
 			self.path = task.path

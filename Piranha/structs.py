@@ -48,6 +48,7 @@ class RedisPriorityQueue(RedisStruct):
 
 class RedisKVStore(RedisStruct):
 	def put(self, key, value, ttl=None):
+		value = Husky.dumps(value)
 		if ttl:
 			self.redis.setex("%s_%s" % (self.name, key), ttl, value)
 		else:
@@ -55,7 +56,11 @@ class RedisKVStore(RedisStruct):
 		return key
 
 	def get(self, key):
-		return self.redis.get("%s_%s" % (self.name, key))
+		res = self.redis.get("%s_%s" % (self.name, key))
+		if res:
+			return Husky.loads(res)
+		else:
+			return False	
 
 
 class RedisSet(RedisStruct):
@@ -67,6 +72,19 @@ class RedisSet(RedisStruct):
 
 	def __contains__(self, value):
 		return self.redis.sismember(self.name, value)
+
+
+class RedisHashes(RedisStruct):
+	def set(self, name, value):
+		self.redis.hset(self.name, name, value)
+		return True
+
+	def remove(self, name):
+		self.redis.hdel(self.name, name)
+		return True
+
+	def getall(self):
+		return self.redis.hgetall(self.name)
 
 if __name__ == '__main__':
 	pq = RedisPriorityQueue("test", {

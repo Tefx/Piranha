@@ -10,19 +10,22 @@ miniture_port += 1
 Smith = Agent((miniture_host, miniture_port))
 c = Client(("localhost", config.queuepool_port))
 
-# print Smith.fetch()
+print Smith.fetch()
 
-c.add_project("test")
+# c.add_project("test")
+# c.add_project("A")
+# c.add_project("A/B")
+# c.add_project("C")
 # sleep(1)
 
 # print Smith.fetch()
 
-c.add_task("test/add", lambda x,y:x+y)
+# c.add_task("test/add", lambda x,y:x+y)
 # sleep(1)
 
 # print Smith.fetch()
 
-c.add_workers("test/add", 2)
+# c.add_workers("test/add", 2)
 # sleep(1)
 
 # print Smith.fetch()
@@ -39,13 +42,13 @@ c.add_workers("test/add", 2)
 
 # print Smith.fetch()
 
-k = c.push_task("test/add", Task((2,4)))
-sleep(1)
+# k = c.push_task("test/add", Task((2,4)))
+# sleep(1)
 
 # print k
 # print Smith.fetch()
 
-print c.fetch_result("test/add", k)
+# print c.fetch_result("test/add", k)
 # sleep(1)
 
 # print Smith.fetch()
