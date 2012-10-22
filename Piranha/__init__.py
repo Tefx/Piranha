@@ -1,7 +1,7 @@
 import config
-import structs
-from taskqueue import TaskQueue
-from queuepool import QueuePool
-from worker import BaseWorker, MultiTaskWorker, MutableWorker
+from queue import TaskQueue
+from project import Project
+from task import Task
+from worker import Worker
 from client import Client
 from supervisor import Supervisor

@@ -3,6 +3,7 @@
 import sys;sys.path.append("../")
 from Piranha import config
 from Corellia import Worker
-from Piranha import QueuePool
+from Piranha import Project
 
-Worker(QueuePool, config.queuesconfig).run_alone(config.queuepool_port)
+
+Worker(Project, "root", config.redis_conf, True).run_alone(config.queuepool_port)

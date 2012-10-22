@@ -14,12 +14,6 @@ redis_conf = {
 
 timeout = 5
 
-queuesconfig = { 
-    "echo"  :   (redis_conf, timeout),
-    "math"  :   (redis_conf, timeout),
-    "common"  :   (redis_conf, timeout)
-}
-
 queuepool_port = 9999
 queuepool_host = "localhost"
 queuepool_addr = queuepool_host, queuepool_port

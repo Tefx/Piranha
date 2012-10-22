@@ -1,57 +1,56 @@
 import Corellia
-from time import sleep
+import task as tasktypes
+from gevent import sleep
+from Thinkpol import Telescreen
+import config
 
 
-class BaseWorker(object):
-	result_ttl = None
+class Worker(Telescreen):
+	monitoring = ["path", "func"]
 
-	def run(self, queuepool_addr, queue):
+	def __init__(self, root_addr):
+		super(Worker, self).__init__()
+		self.root_addr = root_addr
+		self.path = "*"
+		self.func = None
+		self._connect(config.miniture_addr)
+
+	def run(self):
 		self.queue = None
 		while True:
 			if not self.queue:
 				try:
-					self.queue = Corellia.Client(queuepool_addr)
+					self.queue = Corellia.Client(self.root_addr)
 				except KeyboardInterrupt:
 					break
 				except Exception:
 					sleep(2)
 					continue
-			task = self.queue.pop_task(queue)
+			task = self.queue.pop_task(self.path)
 			if not task:
 				self.queue = None
 				continue
-			key, msg = task
 			try:
-				res = self.handle(msg)
-				self.queue.finish_task(queue, key)
+				res = self.handle(task)
+				self.queue.finish_task(self.oldpath, task.key)
 			except KeyboardInterrupt:
 				break
 			except Exception:
 				continue
 			if res != None:
-				if not self.queue.put_result(queue, key, res, self.result_ttl):
+				if not self.queue.register_result(self.path, task.key, res):
 					self.queue = None
 					continue
 
-class MultiTaskWorker(BaseWorker):	
-	def handle(self, msg):
-		func, args = msg
-		return getattr(self, func, lambda *args: None)(*args)
-
-class MutableWorker(MultiTaskWorker):
-	def __init__(self):
-		super(MutableWorker, self).__init__()
-		self.mods = []
-
-	def register(self, name, f):
-		if name not in self.mods:
-			setattr(self, name, f)
-			self.mods.append(name)
-
-	def unregister(self, name):
-		if name in self.mods:
-			delattr(self, name)
-			self.mods.remove(name)
+	def handle(self, task):
+		print type(task)
+		self.oldpath = self.path
+		if isinstance(task, tasktypes.NewWorkerTask):
+			self.path = task.path
+			self.func = task.get_body()
+		elif isinstance(task, tasktypes.RemoveWorkerTask):
+			self.path = "*"
 		else:
-			raise Exception
+			return self.func(*(task.get_body()))
+
 
