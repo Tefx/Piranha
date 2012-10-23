@@ -9,7 +9,8 @@ from Corellia import Client
 def parse_file(filename):
     g = {}
     execfile(filename, g)
-    return {k:v for k,v in g.iteritems() if isinstance(v, FunctionType)}
+    mods = g["mods"]
+    return {k:v for k,v in g.iteritems() if k in mods}
 
 def make_path(root, filename, k):
     r = "/".join([root.rstrip("/"), os.path.splitext(filename)[0], k])
@@ -20,7 +21,7 @@ if __name__ == '__main__':
     filename = argv[1]
     root = "/"
     project = "/".join([root.rstrip("/"), os.path.splitext(filename)[0]]).lstrip("/")
-    p = {make_path("/", "tt.py", k):v for k,v in parse_file(filename).iteritems()}
+    p = {make_path("/", filename, k):v for k,v in parse_file(filename).iteritems()}
     c = Client(config.queuepool_addr)
     print "adding project:", project
     c.add_project(project)

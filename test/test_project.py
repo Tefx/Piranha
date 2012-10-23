@@ -12,7 +12,10 @@ c = Client(("localhost", config.queuepool_port))
 
 print Smith.fetch()
 
-# c.add_project("test")
+def add(x, y):
+    return x+y
+
+c.add_project("test")
 # c.add_project("A")
 # c.add_project("A/B")
 # c.add_project("C")
@@ -20,7 +23,7 @@ print Smith.fetch()
 
 # print Smith.fetch()
 
-# c.add_task("test/add", lambda x,y:x+y)
+c.add_task("test/add", add)
 # sleep(1)
 
 # print Smith.fetch()
