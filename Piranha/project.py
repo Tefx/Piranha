@@ -54,7 +54,6 @@ class Project(object):
         if path:
             return child.delete_child(path)
         else:
-            child._close_connection()
             del self.children[name]
             self.child_index.remove(name)
             return True

@@ -3,4 +3,4 @@
 import sys;sys.path.append("../")
 from Piranha import Worker, config
 
-Worker(config.queuepool_addr).run()
+Worker(config.rootproject_addr).run()

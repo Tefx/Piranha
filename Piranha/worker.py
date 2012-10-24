@@ -61,6 +61,7 @@ class Worker(Telescreen):
 		if isinstance(task, tasktypes.NewWorkerTask):
 			self.path = task.path
 			self.func = add_globals(task.get_body(), self.sevices)
+			print "Now be added to: [%s] with [%s]" % (self.path, self.func)
 		elif isinstance(task, tasktypes.RemoveWorkerTask):
 			self.path = "*"
 		else:

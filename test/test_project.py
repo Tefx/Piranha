@@ -5,17 +5,15 @@ from Thinkpol import Agent
 from gevent import sleep
 from Piranha import Task
 
-miniture_host, miniture_port = config.miniture_addr
-miniture_port += 1
-Smith = Agent((miniture_host, miniture_port))
-c = Client(("localhost", config.queuepool_port))
+Smith = Agent(config.miniture_addr_for_agent)
+c = Client(config.rootproject_addr)
 
-print Smith.fetch()
+# print Smith.fetch()
 
-def add(x, y):
-    return x+y
+# def add(x, y):
+#     return x+y
 
-c.add_project("test")
+# c.add_project("test")
 # c.add_project("A")
 # c.add_project("A/B")
 # c.add_project("C")
@@ -23,7 +21,7 @@ c.add_project("test")
 
 # print Smith.fetch()
 
-c.add_task("test/add", add)
+# c.add_task("test/add", add)
 # sleep(1)
 
 # print Smith.fetch()
@@ -56,7 +54,9 @@ c.add_task("test/add", add)
 
 # print Smith.fetch()
 
-# c.delete_child("A/B")
+# c.delete_child("uce/reg_mod")
+# c.delete_child("uce/eval")
+c.delete_child("uce")
 # sleep(1)
 
 # print Smith.fetch()

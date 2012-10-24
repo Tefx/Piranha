@@ -1,5 +1,5 @@
 import Corellia
-
+from task import Task
 
 class Client(object):
     def __init__(self, root_addr, path="/"):
@@ -34,6 +34,7 @@ class Client(object):
 
     def __call__(self, *args):
         key = self.client.push_task(self.path, Task(args))
+        return Result(self.root_addr, self.path, key)
 
     def push_task(self, args):
         return self.client.push_task(self.path, Task(args))

@@ -6,4 +6,4 @@ from Corellia import Worker
 from Piranha import RootProject
 
 
-Worker(RootProject, config.redis_conf).run_alone(config.queuepool_port)
+Worker(RootProject, config.redis_conf).run_alone(config.rootproject_port)
