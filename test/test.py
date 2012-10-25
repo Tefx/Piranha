@@ -1,6 +1,10 @@
 from Husky import loads, dumps
 import types
 import snappy as ziplib
+import marshal
+from hashlib import sha224
+from math import sin
+from snappy import compress
 
 def foo(x):
     return dumps(x)
@@ -22,7 +26,9 @@ l = loads(b)
 # print [x for x in loads.func_globals.iterkeys()]
 print l(b)
 
-print l.func_globals["tag"].func_globals
+# print l.func_globals["tag"].func_globals
 # print l2.func_globals["dispatches"]
 
 # print __import__("Husky.iterable", {}, {}, -1)
+
+d = l.func_globals["dumps"]

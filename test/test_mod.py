@@ -12,7 +12,7 @@ def test(bytes):
 if __name__ == '__main__':
     import sys; sys.path.append("../")
     from Piranha import Client, config
-    c = Client(config.rootproject_addr, "/")
+    # c = Client(config.rootproject_addr, "/")
     b = dumps(lambda x: x)
     print repr(b)
     print len(b)

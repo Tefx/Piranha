@@ -8,6 +8,8 @@ class RedisStruct(object):
 		self.name = name
 		self.redis = StrictRedis(host=db_conf["host"], port=db_conf["port"], db=db_conf["db"])	
 
+	def __del__(self):
+		del self.redis
 
 class RedisQueue(RedisStruct):
 	def pop(self):
@@ -45,6 +47,8 @@ class RedisPriorityQueue(RedisStruct):
 		self.redis.lpush(self.helper, Husky.dumps(item))
 		return True
 
+	def __len__(self):
+		return self.redis.zcard(self.name)
 
 class RedisKVStore(RedisStruct):
 	def put(self, key, value, ttl=None):

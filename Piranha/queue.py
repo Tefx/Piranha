@@ -11,7 +11,7 @@ from Thinkpol import Telescreen
 import config
 
 class TaskQueue(Telescreen):
-    monitoring = ["path", "handler"]
+    monitoring = ["path", "len_wq"]
 
     def __init__(self, path, db_conf, handler=None, ttl=None, queue_timeout=60, task_timeout=5):
         super(TaskQueue, self).__init__()
@@ -69,6 +69,9 @@ class TaskQueue(Telescreen):
                 self.waitting_queue.push(task, task.priority)
             else:
                 self.finished_task.remove(task.key)
+
+    def fetch_trigger(self):
+        self.len_wq = len(self.waitting_queue)
 
     def __del__(self):
         del self.waitting_queue

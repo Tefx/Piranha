@@ -39,6 +39,9 @@ class Project(object):
             if not child: return False
             return child.add_child(path, task, *args)
         else:
+            if name in self.children:
+                del self.children[name]
+                self.child_index.remove(name)
             if task:
                 self.child_index.set(name, TYPE_TASKQUEUE)
                 self.children[name] = TaskQueue(self.join_path(name), self.db_conf, *args)
@@ -52,11 +55,10 @@ class Project(object):
         child = self.children.get(name, None)
         if not child: return False
         if path:
-            return child.delete_child(path)
-        else:
-            del self.children[name]
-            self.child_index.remove(name)
-            return True
+            child.delete_child(path)
+        del self.children[name]
+        self.child_index.remove(name)
+        return True
 
     def find_handler(self, path):
         name, path = self.split_path(path)
@@ -126,6 +128,11 @@ class Project(object):
                 elif self.type(k) == TYPE_PROJECT:
                     res[k] = v.list()
             return res
+
+    def __del__(self):
+        for cn in self.children.iterkeys():
+            self.child_index.remove(cn)
+        del self.children
 
 
 class RootProject(Project, Telescreen):
